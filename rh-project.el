@@ -35,8 +35,7 @@
 (defgroup rh-project nil
   "Ramblehead Project mode."
   :prefix "rh-project-"
-  ;; :group '???
-  )
+  :group 'tools)
 
 ;; TODO: Convert rh-project-trusted-ids to `defcustom'
 (defvar rh-project-trusted-ids '())
@@ -77,7 +76,7 @@
       (abbreviate-file-name
        (expand-file-name (concat rh-project "../"))))))
 
-(cl-defun rh-project-setup ()
+(defun rh-project-setup ()
   (let ((rh-project-path (rh-project-get-path)))
     (when rh-project-path
       (when buffer-file-name
@@ -113,7 +112,7 @@
           (sit-for 1))
         (kill-buffer)))
     (setq compilation-buffer (generate-new-buffer compilation-buffer-or-name))
-    (g2w-buffer-destination-window-init compilation-buffer current-window nil)
+    ;; (g2w-buffer-destination-window-init compilation-buffer current-window nil)
     (with-current-buffer compilation-buffer
       (vterm-mode)
       (setq-local rh-project-compile t)
