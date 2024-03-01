@@ -25,13 +25,21 @@
 
 ;;; Code:
 
-(require 'vterm nil t)
+;; TODO: Convert config-vterm and config-bs to packages, so rh-project
+;;       can depend on them and also converted to package.
+(require 'vterm)
+(require 'config-vterm)
+(require 'bs)
+(require 'config-bs)
 
 (defgroup rh-project nil
   "Ramblehead Project mode."
   :prefix "rh-project-"
   ;; :group '???
   )
+
+;; TODO: Convert rh-project-trusted-ids to `defcustom'
+(defvar rh-project-trusted-ids '())
 
 (defvar rh-project-initialised-projects '())
 (defvar rh-project-trusted-dir-marker ".rh-trusted")
@@ -98,7 +106,7 @@
     (when (get-buffer compilation-buffer-or-name)
       (with-current-buffer compilation-buffer-or-name
         (when (vterm-check-proc)
-          (vterm-send-C-c)
+          (rh-vterm-send-C-c)
           ;; Giving 1 sec for complication process to end; if it does not end the
           ;; following kill-buffer() should ask whether to kill it with live
           ;; process.
@@ -115,7 +123,7 @@
                full-command
                "; exit"))
       (vterm-send-return))
-    (rh-bs-display-buffer-in-bootom-0-side-window compilation-buffer)))
+    (rh-bs-display-buffer-in-botom-0-side-window compilation-buffer)))
 
 (defalias 'rh-project-run #'rh-project-compile)
 
@@ -123,15 +131,15 @@
   (let* ((vterm-pwd (or pwd (rh-project-get-root)))
          (vterm-buffer (get-buffer term-buffer-or-name)))
     (if (and vterm-buffer (get-buffer-process vterm-buffer))
-        (rh-bs-display-buffer-in-bootom-0-side-window vterm-buffer)
+        (rh-bs-display-buffer-in-botom-0-side-window vterm-buffer)
       (if vterm-buffer (kill-buffer vterm-buffer))
       (setq vterm-buffer (get-buffer-create term-buffer-or-name))
       (with-current-buffer vterm-buffer
         (setq-local vterm-kill-buffer-on-exit t)
         (setq-local default-directory vterm-pwd)
         (vterm-mode)))
-    (rh-bs-display-buffer-in-bootom-0-side-window vterm-buffer)
-    (select-window (rh-bs-get-bootom-0-side-window))))
+    (rh-bs-display-buffer-in-botom-0-side-window vterm-buffer)
+    (select-window (rh-bs-get-botom-0-side-window))))
 
 (defun rh-project-run-shell-command (command output-buffer-or-name)
   (let* ((project-path (rh-project-get-path))
@@ -140,9 +148,9 @@
     (when (get-buffer output-buffer-or-name)
       (with-current-buffer output-buffer-or-name
         (when (process-live-p vterm--process)
-          (vterm-send-C-c)
+          (rh-vterm-send-C-c)
           ;; (sit-for 0.1)
-          ;; (vterm-send-C-c)
+          ;; (rh-vterm-send-C-c)
           ;; (sit-for 1)
           (vterm-send-string "exit")
           (vterm-send-return)
@@ -154,17 +162,17 @@
       ;; (compilation-minor-mode)
       (vterm-send-string full-command)
       (vterm-send-return))
-    (rh-bs-display-buffer-in-bootom-0-side-window output-buffer)
+    (rh-bs-display-buffer-in-botom-0-side-window output-buffer)
     (get-buffer-process output-buffer)))
 
 (defun rh-project-kill-shell-process
     (output-buffer-or-name &optional interrupt)
   (let ((buffer (get-buffer output-buffer-or-name)))
     (when (and buffer (not (get-buffer-window buffer 'visible)))
-      (rh-bs-display-buffer-in-bootom-0-side-window buffer))
+      (rh-bs-display-buffer-in-botom-0-side-window buffer))
     (with-current-buffer buffer
       (when (process-live-p vterm--process)
-        (vterm-send-C-c)
+        (rh-vterm-send-C-c)
         (sit-for 0.1)
         (vterm-send-string "exit")
         (vterm-send-return)))))
