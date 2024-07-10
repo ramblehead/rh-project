@@ -70,11 +70,11 @@
    (rh-project-buffer-dir)
    rh-project-trusted-dir-marker))
 
-(defun rh-project-get-root ()
+(defun rh-project-get-root (&optional hop)
   (let ((rh-project (rh-project-get-path)))
     (when rh-project
       (abbreviate-file-name
-       (expand-file-name (concat rh-project "../"))))))
+       (expand-file-name (concat rh-project (if hop "../hop/" "../")))))))
 
 (defun rh-project-setup ()
   (let ((rh-project-path (rh-project-get-path)))
